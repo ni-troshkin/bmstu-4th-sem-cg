@@ -39,12 +39,13 @@ class Ui_MainWindow(object):
         # основное окно
         self.window_cg1 = QtWidgets.QWidget(MainWindow)
         self.window_cg1.setObjectName("window_cg1")
+        self.window_cg1.setMinimumSize(QtCore.QSize(1600, 900))
         self.widget = QtWidgets.QWidget(self.window_cg1)
         self.widget.setGeometry(QtCore.QRect(15, 9, 1571, 881))
         self.widget.setObjectName("widget")
         # выравнивание по сетке
-        self.gridLayout = QtWidgets.QGridLayout(self.widget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout = QtWidgets.QGridLayout(self.window_cg1)
+        self.gridLayout.setContentsMargins(7, 7, 10, 10)
         self.gridLayout.setObjectName("gridLayout")
 
         # сцена, от которой можно унаследовать холст и на нем рисовать
