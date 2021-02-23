@@ -117,6 +117,8 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
         self.labels = []    # массив надписей как объектов на экране
         self.lines = []    # массив линий как объектов на экране
 
+        self.tri_points = []
+
     # формирование окна с предупреждением с заданным текстом
     def show_warning(self, title, text, font):
         msg = QtWidgets.QMessageBox()
@@ -222,6 +224,8 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
         
             if needs_zooming:
                 self.rezoom_canvas()
+                if self.tri_points != []:
+                    self.draw_triangle(self.tri_points[0], self.tri_points[1], self.tri_points[2])
 
             x, y = self.convert_point(-1)
             self.objects.append(None)    # резервируется место в списке точек
@@ -287,10 +291,21 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
             self.pixels.pop(num - 1)
             self.objects.pop(num - 1)
             self.labels.pop(num - 1)
+            if num - 1 in self.tri_points:
+                self.tri_points.clear()
+                self.clear_triangle()
+            
+            for i in range(len(self.tri_points)):
+                if self.tri_points[i] > num - 1:
+                    self.tri_points[i] -= 1
 
             if needs_zooming:
                 self.refresh_limits()
                 self.rezoom_canvas()
+                if self.tri_points != []:
+                    self.draw_triangle(*self.tri_points)
+                else:
+                    self.clear_triangle()
 
     # текстовый вывод результата 
     def show_result(self, info):
@@ -317,8 +332,8 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
 
     # нахождение искомого треугольника
     def find_clicked(self):
-        triangle = None
         info = tuple()
+        triangle = None
 
         # проверка достаточного количества точек
         if len(self.points) < 3:
@@ -350,14 +365,18 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
             "множестве точек невозможно построить треугольники (точки лежат "
             "на одной прямой)", "Ubuntu 15")
         else:
-            self.draw_triangle(info[3], info[4], info[5])
+            self.tri_points = [info[3], info[4], info[5]]
+            self.draw_triangle(*self.tri_points)
             self.show_result(info)
 
-    def draw_triangle(self, i, j, k):
+    def clear_triangle(self):
         # очистка старого треугольника, если он был на экране
         for line in self.lines:
             self.scene.removeItem(line)
         self.lines.clear()
+
+    def draw_triangle(self, i, j, k):
+        self.clear_triangle()
 
         self.blackpen = QtGui.QPen(QtCore.Qt.black)
         self.blackpen.setWidth(4)
@@ -430,9 +449,18 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
             self.labels[i].setText(str(i + 1) + '(' + str(self.points[i][0]) 
                 + ', ' + str(self.points[i][1]) + ')')
             
+            if i in self.tri_points:
+                self.tri_points.clear()
+                self.clear_triangle()
+
             if needs_zooming:
                 self.refresh_limits()
                 self.rezoom_canvas()
+                if self.tri_points != []:
+                    self.draw_triangle(*self.tri_points)
+                else:
+                    self.clear_triangle()
+
             else:    # перерисовывается только измененная точка
                 self.scene.removeItem(self.objects[i])
                 new_x, new_y = self.convert_point(i)
