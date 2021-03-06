@@ -72,8 +72,8 @@ class Triangle():
         zbmbc = xbm*ybc - ybm*xbc
         zcmca = xcm*(-yac) + ycm*xac
 
-        if ((zamab > 0) and (zbmbc > 0) and
-            (zcmca > 0)) or ((zamab < 0) and (zbmbc < 0) and (zcmca < 0)):
+        if ((zamab > 0) and (zbmbc > 0) and (zcmca > 0)) or \
+            ((zamab < 0) and (zbmbc < 0) and (zcmca < 0)):
             return True
         return False
 
