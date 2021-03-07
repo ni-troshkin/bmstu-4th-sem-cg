@@ -1,45 +1,152 @@
-# лабораторная работа №2 по КГ
-# преобразование плоского изображения
-
-# 1. Обеспечить вывод исходного изображения в центре экрана. 
-# 2. Целесообразно знать (вывести) координаты центральной точки изображения.
-
-# 3. Размеры изображения должны быть такими, чтобы при первых двух-трех преобразованиях 
-# изображение находилось бы в пределах экрана (хотя бы частично). 
-
-# 4. Обеспечить задание параметров каждой из операций и последующее их выполнение.
-# 5. Параметры операций желательно задавать в полях ввода и сохранять до задания новых значений 
-# для выполнения следующей операции. 
-# 6. Координаты центра масштабирования и поворота можно 
-# задавать в одних и тех же полях, чтобы пользователь мог использовать те же значения при
-# выполнении другой операции.
-
-# 7. Каждое преобразование применяется к текущему изображению.
-# 8. Предусмотреть возможность возврата на один шаг назад (к изображению, полученному после 
-# выполнения предыдущей операции).
-# 9. Можно использовать экранную систему координат.
-
-# Нарисовать исходную фигуру, осуществить перенос, масштабирование и поворот
-# Эпициклоида (фон заштрихован) задана уравнением
-# x = (a+b)*cos(t) - a*cos((a+b)t/a)
-# y = (a+b)*sin(t) - a*sin((a+b)t/a)
-# a > 0
-# b > 0
-# b/a - целое положительное число (напр 3)
-# t э [0, 2*П]
-
+import app_interface, sys
 from epicycloid import Epicycloid
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtGui import QPen, QBrush 
 
-class Window():
+EPS = 1e-07
+
+class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.setupUi()
+        self.setupUi(self)
+
+        self.exit_btn.clicked.connect(self.exit)
+        self.move_btn.clicked.connect(self.move)
+        self.scale_btn.clicked.connect(self.scale)
+        self.rotate_btn.clicked.connect(self.rotate)
+        self.back_btn.clicked.connect(self.back)
+        self.origin_btn.clicked.connect(self.origin)
+        self.info_btn.clicked.connect(self.show_info)
+
+        self.pen = QPen(Qt.darkGreen)
+        self.pen.setWidth(3)
 
         self.figure = Epicycloid()
+        self.figure.draw_init(self.scene, self.pen)
+        self.label_center.setText("Центр фигуры С({:.2f}, "
+                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
 
-if __name__ == __main__:
-    pass
+        self.last = {"trans": "", "x": 0, "y": 0, "cx": 0, "cy": 0, "angle": 0}
+    
+    def origin(self):
+        del self.figure
+        self.figure = Epicycloid()
+        self.scene.clear()
+        self.figure.draw_init(self.scene, self.pen)
+        self.label_center.setText("Центр фигуры С({:.2f}, "
+                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+
+    def exit(self):
+        sys.exit(0)
+    
+    def scale(self):
+        try:
+            cx = float(self.entry_cx.text())
+            cy = float(self.entry_cy.text())
+            kx = float(self.entry_kx.text())
+            ky = float(self.entry_ky.text())
+        
+        except:
+            self.show_warning("Неверные параметры", "Координаты и коэффициенты масштабирования должны "
+                "являться вещественными числами", "Ubuntu 15")
+        else:
+            self.last['trans'] = 'scale'
+            self.last['cx'] = cx
+            self.last['cy'] = cy
+            if abs(kx) < EPS or abs(ky) < EPS:
+                self.last['x'] = self.last['y'] = None
+            else:
+                self.last['x'] = kx
+                self.last['y'] = ky
+            self.figure.scale(self.scene, self.pen, cx, cy, kx, ky)
+            self.label_center.setText("Центр фигуры С({:.2f}, "
+                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+        
+    def rotate(self):
+        try:
+            cx = float(self.entry_cx.text())
+            cy = float(self.entry_cy.text())
+            deg = float(self.entry_angle.text())
+        
+        except:
+            self.show_warning("Неверные параметры", "Координаты и угол должны "
+                "являться вещественными числами", "Ubuntu 15")
+        else:
+            self.last['trans'] = 'rotate'
+            self.last['cx'] = cx
+            self.last['cy'] = cy
+            self.last['angle'] = deg
+            self.figure.rotate(self.scene, self.pen, cx, cy, deg)
+            self.label_center.setText("Центр фигуры С({:.2f}, "
+                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+
+    def show_info(self):
+        info = QtWidgets.QMessageBox()
+        info.setGeometry(800, 400, 250, 200)
+        info.setWindowTitle("Информация о программе")
+
+        info.setText("Программа позволяет осуществлять преобразования над "
+            "плоской геометрической фигурой (эпициклоидой) - перенос, масштабирование, поворот.")
+    
+        info.setFont(QtGui.QFont("Ubuntu 15"))
+        info.setIcon(QtWidgets.QMessageBox.Information)
+        info.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        info.exec_()
+
+    def show_warning(self, title, text, font):
+        msg = QtWidgets.QMessageBox()
+        msg.setGeometry(800, 400, 250, 200)
+        msg.setWindowTitle(title)
+        msg.setText(text)
+        msg.setFont(QtGui.QFont(font))
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        msg.exec_()
+
+    def move(self):
+        try:
+            dx = float(self.entry_dx.text())
+            dy = float(self.entry_dy.text())
+        except:
+            self.show_warning("Неверное смещение", "Координаты должны "
+                "являться вещественными числами", "Ubuntu 15")
+        else:
+            self.last['trans'] = 'move'
+            self.last['x'] = dx
+            self.last['y'] = dy
+            self.figure.move(self.scene, self.pen, dx, dy)
+            self.label_center.setText("Центр фигуры С({:.2f}, "
+                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+        
+    def back(self):
+        if self.last["trans"] == "":
+            self.show_warning("Невозможно вернуться", "Не сделано ни одного "
+            "преобразования или возврат был в предыдущем действии", "Ubuntu 15")
+        
+        if self.last["trans"] == 'move':
+            self.figure.move(self.scene, self.pen, -(self.last["x"]), -(self.last["y"]))
+            self.label_center.setText("Центр фигуры С({:.2f}, "
+                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+        elif self.last["trans"] == 'scale':
+            if self.last['x'] == None:
+                self.figure.draw_points(self.scene, self.pen)
+            else:
+                self.figure.scale(self.scene, self.pen, self.last["cx"], self.last["cy"], 
+                    1 / self.last["x"], 1 / self.last["y"])
+                self.label_center.setText("Центр фигуры С({:.2f}, "
+                    "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+        elif self.last["trans"] == 'rotate':
+            self.figure.rotate(self.scene, self.pen, self.last["cx"], self.last["cy"], -(self.last["angle"]))
+            self.label_center.setText("Центр фигуры С({:.2f}, "
+                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+            
+        self.last["trans"] = ""
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    win = Window()
+    win.show()
+    app.exec()
