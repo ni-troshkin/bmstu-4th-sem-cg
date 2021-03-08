@@ -1,6 +1,3 @@
-# лэйаут
-# шрифты
-
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QPen, QBrush
@@ -12,7 +9,7 @@ EPS = 1e-7
 class Epicycloid():
     def __init__(self):
         self.coeff = 3    # соотношение b/a
-        self.a = 10    # значение параметра а (радиус катящейся окр-ти)
+        self.a = 50    # значение параметра а (радиус катящейся окр-ти)
         self.b = self.a * self.coeff
 
         self.dots = []    # массив точек, через которые проходит кривая
