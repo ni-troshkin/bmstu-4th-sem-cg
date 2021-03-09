@@ -36,7 +36,7 @@ class Epicycloid():
         self.dots.clear()
         x = self.x(t) + self.center_x
         y = self.y(t) + self.center_y
-        self.dots.append((x, y))
+        self.dots.append(np.array([x, y, 1], np.double))
 
         while t < 2 * pi:
             step = self.get_step(x, y)
@@ -46,7 +46,7 @@ class Epicycloid():
             
             scene.addLine(x, y, new_x, new_y, pen)
             x, y = new_x, new_y
-            self.dots.append((x, y))
+            self.dots.append(np.array([x, y, 1], np.double))
 
     def draw_points(self, scene, pen):
         # рисование фигуры по точкам
@@ -68,9 +68,7 @@ class Epicycloid():
     def update_dots(self, matrix, scene, pen):
         # пересчет и отрисовка точек преобразованной фигуры
         for i in range(len(self.dots)):
-            vector = np.array([self.dots[i][0], self.dots[i][1], 1], np.double)
-            res = np.matmul(vector, matrix)
-            self.dots[i] = (res[0], res[1])
+            self.dots[i] = np.matmul(self.dots[i], matrix)
         self.draw_points(scene, pen)
         self.update_center(matrix)
 
