@@ -6,56 +6,38 @@ import numpy as np
 
 EPS = 1e-7
 
-class Epicycloid():
+class Rectangle():
     def __init__(self):
-        self.coeff = 5   # соотношение b/a
-        self.a = 30    # значение параметра а (радиус катящейся окр-ти)
-        self.b = self.a * self.coeff
+        self.h_width = 250
+        self.h_height = 200
 
         self.dots = []    # массив точек, через которые проходит кривая
 
         self.center_x = 600    # задание начального центра фигуры на экране
         self.center_y = 440
     
-    def x(self, t):
-        return (self.a + self.b) * cos(t) - self.a * \
-            cos((self.a + self.b) * t / self.a)
-
-    def y(self, t):
-        return (self.a + self.b) * sin(t) - self.a * \
-            sin((self.a + self.b) * t / self.a)
-
-    def get_step(self, x, y):
-        # приближенно (!) рассчитываем шаг угла как 1/r
-        r = sqrt((x - self.center_x) ** 2 + (y - self.center_y) ** 2)
-        return 1 / r
-
     def draw_init(self, scene: QGraphicsScene, pen: QPen):
         # первоначальная отрисовка фигуры на экране, заполнение массива точек
-        t = 0.0
         self.dots.clear()
-        x = self.x(t) + self.center_x
-        y = self.y(t) + self.center_y
-        self.dots.append(np.array([x, y, 1], np.double))
+        
+        self.dots.append(np.array([self.center_x - self.h_width, 
+            self.center_y - self.h_height, 1], np.double))
+        self.dots.append(np.array([self.center_x - self.h_width, 
+            self.center_y + self.h_height, 1], np.double))
+        self.dots.append(np.array([self.center_x + self.h_width, 
+            self.center_y + self.h_height, 1], np.double))
+        self.dots.append(np.array([self.center_x + self.h_width, 
+            self.center_y - self.h_height, 1], np.double))
 
-        while t < 2 * pi:
-            step = self.get_step(x, y)
-            t += step
-            new_x = self.x(t) + self.center_x
-            new_y = self.y(t) + self.center_y
-            
-            scene.addLine(x, y, new_x, new_y, pen)
-            x, y = new_x, new_y
-            self.dots.append(np.array([x, y, 1], np.double))
+        self.draw_points(scene, pen)
 
     def draw_points(self, scene, pen):
         # рисование фигуры по точкам
         for i in range(len(self.dots) - 1):
-            # проверка, не попадаем ли мы в тот же пиксель
-            if int(self.dots[i][0]) != int(self.dots[i + 1][0]) or \
-                int(self.dots[i][1]) != int(self.dots[i + 1][1]):
-                scene.addLine(self.dots[i][0], self.dots[i][1], 
-                    self.dots[i+1][0], self.dots[i+1][1], pen)
+            scene.addLine(self.dots[i][0], self.dots[i][1], 
+                self.dots[i+1][0], self.dots[i+1][1], pen)
+        scene.addLine(self.dots[-1][0], self.dots[-1][1],
+            self.dots[0][0], self.dots[0][1], pen)
 
     def update_center(self, matrix):
         # пересчет координат центра по матрице преобразования

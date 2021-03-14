@@ -1,5 +1,6 @@
 import app_interface, sys
 from epicycloid import Epicycloid
+from rect import Rectangle
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
@@ -24,7 +25,10 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
         self.pen.setWidth(3)
 
         self.figure = Epicycloid()    # создание и отрисовка объекта фигуры
+        self.scene.clear()
         self.figure.draw_init(self.scene, self.pen)
+        self.rectan = Rectangle()
+        self.rectan.draw_init(self.scene, self.pen)
         self.update_center()
 
         # словарь, в котором хранится информация о последнем преобразовании
@@ -37,7 +41,7 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
 
         info.setText("Программа позволяет осуществлять преобразования над "
             "плоской геометрической фигурой (эпициклоидой) - перенос, "
-            "масштабирование, поворот.")
+            "масштабирование, поворот.\nСистема координат экранная.")
     
         info.setFont(QtGui.QFont("Ubuntu 15"))
         info.setIcon(QtWidgets.QMessageBox.Information)
@@ -56,19 +60,19 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
 
     def update_center(self):
         self.label_center.setText("Центр фигуры С({:.2f}, "
-                "{:.2f})".format(self.figure.center_x, self.figure.center_y))
+                "{:.2f})".format(self.rectan.center_x, self.rectan.center_y))
     
     def zero_scale_update_center(self, cx, cy):
         # используется при нулевом масштабировании
         if self.last['x'] == None:
             center_x = cx
         else:
-            center_x = self.figure.center_x
+            center_x = self.rectan.center_x
 
         if self.last['y'] == None:
             center_y = cy
         else:
-            center_y = self.figure.center_y
+            center_y = self.rectan.center_y
 
         self.label_center.setText("Центр фигуры С({:.2f}, "
                 "{:.2f})".format(center_x, center_y))
@@ -89,7 +93,9 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
             self.last['trans'] = 'scale'
             self.last['cx'] = cx
             self.last['cy'] = cy
-            cenx, ceny = self.figure.scale(self.scene, self.pen, cx, cy, kx, ky)
+            self.scene.clear()
+            self.figure.scale(self.scene, self.pen, cx, cy, kx, ky)
+            cenx, ceny = self.rectan.scale(self.scene, self.pen, cx, cy, kx, ky)
             if abs(kx) < EPS or abs(ky) < EPS:
                 if abs(kx) < EPS:
                     self.last['x'] = None
@@ -115,7 +121,9 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
             self.last['cx'] = cx
             self.last['cy'] = cy
             self.last['angle'] = deg
+            self.scene.clear()
             self.figure.rotate(self.scene, self.pen, cx, cy, deg)
+            self.rectan.rotate(self.scene, self.pen, cx, cy, deg)
             self.update_center()
 
     def move_wrapper(self):
@@ -129,7 +137,9 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
             self.last['trans'] = 'move'
             self.last['x'] = dx
             self.last['y'] = dy
+            self.scene.clear()
             self.figure.move(self.scene, self.pen, dx, dy)
+            self.rectan.move(self.scene, self.pen, dx, dy)
             self.update_center()
 
     def back(self):
@@ -138,20 +148,32 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
             "преобразования или возврат был в предыдущем действии", "Ubuntu 15")
         
         elif self.last["trans"] == 'move':
+            self.scene.clear()
             self.figure.move(self.scene, self.pen, 
+                -(self.last["x"]), -(self.last["y"]))
+
+            self.rectan.move(self.scene, self.pen, 
                 -(self.last["x"]), -(self.last["y"]))
             self.update_center()
 
         elif self.last["trans"] == 'scale':
             if self.last['x'] == None or self.last['y'] == None:
+                self.scene.clear()
                 self.figure.draw_points(self.scene, self.pen)
+                self.rectan.draw_points(self.scene, self.pen)
             else:
+                self.scene.clear()
                 self.figure.scale(self.scene, self.pen, self.last["cx"], 
+                    self.last["cy"], 1 / self.last["x"], 1 / self.last["y"])
+                self.rectan.scale(self.scene, self.pen, self.last["cx"], 
                     self.last["cy"], 1 / self.last["x"], 1 / self.last["y"])
             self.update_center()
 
         elif self.last["trans"] == 'rotate':
+            self.scene.clear()
             self.figure.rotate(self.scene, self.pen, self.last["cx"], 
+                self.last["cy"], -(self.last["angle"]))
+            self.rectan.rotate(self.scene, self.pen, self.last["cx"], 
                 self.last["cy"], -(self.last["angle"]))
             self.update_center()
             
@@ -160,8 +182,10 @@ class Window(QtWidgets.QMainWindow, app_interface.Ui_MainWindow):
     def origin(self):    # отрисовывает первоначальную фигуру
         del self.figure
         self.figure = Epicycloid()
+        self.rectan = Rectangle()
         self.scene.clear()
         self.figure.draw_init(self.scene, self.pen)
+        self.rectan.draw_init(self.scene, self.pen)
         self.update_center()
 
     def exit(self):
