@@ -1,0 +1,861 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Построение отрезков</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(205, 235, 255);</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="minimumSize">
+    <size>
+     <width>1600</width>
+     <height>900</height>
+    </size>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>10</y>
+      <width>1581</width>
+      <height>882</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="horizontalSpacing">
+      <number>9</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QGraphicsView" name="canvas">
+       <property name="minimumSize">
+        <size>
+         <width>1200</width>
+         <height>880</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1200</width>
+         <height>880</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(212, 255, 191);</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSplitter" name="splitter_11">
+       <property name="minimumSize">
+        <size>
+         <width>351</width>
+         <height>880</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>351</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="handleWidth">
+        <number>11</number>
+       </property>
+       <widget class="QComboBox" name="line_alg">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>351</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 255, 255);
+selection-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="currentText">
+         <string>Выберите алгоритм...</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Выберите алгоритм...</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Библиотечный алгоритм</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ЦДА</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Алгоритм Брезенхема</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Брезенхем целочисленный</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Брезенхем с устранением</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Алгоритм Ву</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QComboBox" name="line_color">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>351</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 255, 255);
+selection-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="currentText">
+         <string>Выберите цвет...</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Выберите цвет...</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Красный</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Синий</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Черный</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Розовый</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Оранжевый</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QSplitter" name="splitter_6">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLabel" name="label_sx">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Х начала</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_sy">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Y начала</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QSplitter" name="splitter">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLineEdit" name="entry_sx">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="entry_sy">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QSplitter" name="splitter_7">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLabel" name="label_ex">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Х конца</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_ey">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Y конца</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QSplitter" name="splitter_2">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLineEdit" name="entry_ex">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="entry_ey">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QPushButton" name="line_btn">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>351</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>KacstTitle</family>
+          <pointsize>15</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 140, 0);
+color: rgb(255, 255, 255)</string>
+        </property>
+        <property name="text">
+         <string>Построить отрезок</string>
+        </property>
+       </widget>
+       <widget class="QSplitter" name="splitter_10">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QComboBox" name="spectre_alg">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);
+selection-color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="currentText">
+          <string>Алгоритм...</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Алгоритм...</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>ЦДА</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Брезенхем</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Брез. целочисленный</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Брез. с устранением</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Ву</string>
+          </property>
+         </item>
+        </widget>
+        <widget class="QComboBox" name="spectre_color">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);
+selection-color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="currentText">
+          <string>Выбор цвета...</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Выбор цвета...</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Цвет фона</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Красный</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Синий</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Черный</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Розовый</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Оранжевый</string>
+          </property>
+         </item>
+        </widget>
+       </widget>
+       <widget class="QSplitter" name="splitter_8">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLabel" name="label_cx">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Х центра</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_cy">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Y центра</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QSplitter" name="splitter_3">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLineEdit" name="entry_cx">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="entry_cy">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QSplitter" name="splitter_9">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLabel" name="label_len">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Длина отрезков</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_angle">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>14</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Шаг угла (в ॰)</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QSplitter" name="splitter_4">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>29</number>
+        </property>
+        <widget class="QLineEdit" name="entry_len">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="entry_angle">
+         <property name="font">
+          <font>
+           <pointsize>15</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QPushButton" name="spectre_btn">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>351</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>KacstTitle</family>
+          <pointsize>15</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 140, 0);
+color: rgb(255, 255, 255)</string>
+        </property>
+        <property name="text">
+         <string>Вывести спектр</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="time_btn">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>351</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>KacstTitle</family>
+          <pointsize>15</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 140, 0);
+color: rgb(255, 255, 255)</string>
+        </property>
+        <property name="text">
+         <string>Исследование времени</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="step_btn">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>351</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>KacstTitle</family>
+          <pointsize>15</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 140, 0);
+color: rgb(255, 255, 255)</string>
+        </property>
+        <property name="text">
+         <string>Исследование ступенчатости</string>
+        </property>
+       </widget>
+       <widget class="QSplitter" name="splitter_5">
+        <property name="minimumSize">
+         <size>
+          <width>351</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>9</number>
+        </property>
+        <widget class="QPushButton" name="clear_btn">
+         <property name="maximumSize">
+          <size>
+           <width>171</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>KacstTitle</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(0, 0, 140);
+color: rgb(255, 255, 255)</string>
+         </property>
+         <property name="text">
+          <string>Очистить</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="exit_btn">
+         <property name="font">
+          <font>
+           <family>KacstTitle</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(140, 0, 0);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>Выход</string>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
