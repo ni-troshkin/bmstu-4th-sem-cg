@@ -213,9 +213,9 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         canon = dict()
         param = dict()
         lib = dict()
-        # bres = dict()
-        # middot = dict()
-        for i in range(11):
+        bres = dict()
+        middot = dict()
+        for i in range(3):
             ellipse = Ellipse(cx, cy, r, r)
             sum_time = 0
             for j in range(REPEATS):
@@ -238,25 +238,25 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 sum_time += time() - start
             param[r] = sum_time / REPEATS * 1000000
 
-            # sum_time = 0
-            # for j in range(REPEATS):
-            #     start = time()
-            #     ellipse.create_bresenham()
-            #     sum_time += time() - start
-            # bres[r] = sum_time / REPEATS * 1000000
+            sum_time = 0
+            for j in range(REPEATS):
+                start = time()
+                ellipse.create_bresenham()
+                sum_time += time() - start
+            bres[r] = sum_time / REPEATS * 1000000
 
-            # sum_time = 0
-            # for j in range(REPEATS):
-            #     start = time()
-            #     ellipse.create_middledot()
-            #     sum_time += time() - start
-            # middot[r] = sum_time / REPEATS * 1000000
+            sum_time = 0
+            for j in range(REPEATS):
+                start = time()
+                ellipse.create_middledot()
+                sum_time += time() - start
+            middot[r] = sum_time / REPEATS * 1000000
 
             r += 50
         
-        self.circle_plot(lib, canon, param)
+        self.circle_plot(lib, canon, param, bres, middot)
 
-    def circle_plot(self, lib, canon, param):
+    def circle_plot(self, lib, canon, param, bres, middot):
         xlib = list(lib.keys())
         ylib = list(lib.values())
         plt.plot(xlib, ylib, 'r', label="LIBRARY")
@@ -264,10 +264,10 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         plt.plot(xlib, ycanon, 'g', label="CANON EQUATION")
         yparam = list(param.values())
         plt.plot(xlib, yparam, 'b', label="PARAMETER EQUATION")
-        # ybres = list(bres.values())
-        # plt.plot(xlib, ybres, ':b', label="BRESENHAM")
-        # ymiddot = list(middot.values())
-        # plt.plot(xlib, ymiddot, '-y', label="MIDDLE POINT")
+        ybres = list(bres.values())
+        plt.plot(xlib, ybres, 'y', label="BRESENHAM")
+        ymiddot = list(middot.values())
+        plt.plot(xlib, ymiddot, 'm', label="MIDDLE POINT")
 
         plt.legend()
 
@@ -284,9 +284,9 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         canon = dict()
         param = dict()
         lib = dict()
-        # bres = dict()
-        # middot = dict()
-        for i in range(11):
+        bres = dict()
+        middot = dict()
+        for i in range(3):
             ellipse = Ellipse(cx, cy, a, b)
             sum_time = 0
             for j in range(REPEATS):
@@ -309,26 +309,23 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 sum_time += time() - start
             param[a] = sum_time / REPEATS * 1000000
 
-            # sum_time = 0
-            # for j in range(REPEATS):
-            #     start = time()
-            #     ellipse.create_bresenham()
-            #     sum_time += time() - start
-            # bres[r] = sum_time / REPEATS * 1000000
+            sum_time = 0
+            for j in range(REPEATS):
+                start = time()
+                ellipse.create_bresenham()
+                sum_time += time() - start
+            bres[a] = sum_time / REPEATS * 1000000
 
-            # sum_time = 0
-            # for j in range(REPEATS):
-            #     start = time()
-            #     ellipse.create_middledot()
-            #     sum_time += time() - start
-            # middot[r] = sum_time / REPEATS * 1000000
+            sum_time = 0
+            for j in range(REPEATS):
+                start = time()
+                ellipse.create_middledot()
+                sum_time += time() - start
+            middot[a] = sum_time / REPEATS * 1000000
 
             a += 50
         
-        self.circle_plot(lib, canon, param)
-
-    def ellipse_plot(self):
-        pass
+        self.circle_plot(lib, canon, param, bres, middot)
 
     def clear_scene(self):
         self.scene.clear()
