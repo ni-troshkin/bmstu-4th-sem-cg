@@ -150,7 +150,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 b_start = float(self.entry_startb.text())
             else:
                 b_start = a_start
-            num = int(self.entry_num.text())
+            num = float(self.entry_num.text())
+            num = int(num)
             step = float(self.entry_step.text())
             if a_start <= 0 or num <= 0 or b_start <= 0:
                 raise ArithmeticError
@@ -215,7 +216,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         lib = dict()
         bres = dict()
         middot = dict()
-        for i in range(3):
+        for i in range(6):
             ellipse = Ellipse(cx, cy, r, r)
             sum_time = 0
             for j in range(REPEATS):
@@ -259,15 +260,15 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def circle_plot(self, lib, canon, param, bres, middot):
         xlib = list(lib.keys())
         ylib = list(lib.values())
-        plt.plot(xlib, ylib, 'r', label="LIBRARY")
+        plt.plot(xlib, ylib, 'r', label="Библиотечный")
         ycanon = list(canon.values())
-        plt.plot(xlib, ycanon, 'g', label="CANON EQUATION")
+        plt.plot(xlib, ycanon, 'g', label="Каноническое ур-е")
         yparam = list(param.values())
-        plt.plot(xlib, yparam, 'b', label="PARAMETER EQUATION")
+        plt.plot(xlib, yparam, 'b', label="Параметрическое ур-е")
         ybres = list(bres.values())
-        plt.plot(xlib, ybres, 'y', label="BRESENHAM")
+        plt.plot(xlib, ybres, 'y', label="Брезенхем")
         ymiddot = list(middot.values())
-        plt.plot(xlib, ymiddot, 'm', label="MIDDLE POINT")
+        plt.plot(xlib, ymiddot, 'm', label="Средняя точка")
 
         plt.legend()
 
@@ -286,7 +287,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         lib = dict()
         bres = dict()
         middot = dict()
-        for i in range(3):
+        for i in range(6):
             ellipse = Ellipse(cx, cy, a, b)
             sum_time = 0
             for j in range(REPEATS):

@@ -45,12 +45,21 @@ class Ellipse():
     def create_canon(self):
         self.points.clear()
         x = -self.a
-        for i in range(2 * int(self.a) + 1):
-            y = sqrt(self.a * self.a - x * x) * self.b / self.a
+        y = sqrt(self.a * self.a - x * x) * self.b / self.a
+        for i in range(2 * int(self.a)):
+            old_y = y
             self.points.append([x + self.center_x, y + self.center_y])
             y *= -1
             self.points.append([x + self.center_x, y + self.center_y])
             x += 1
+            y = sqrt(self.a * self.a - x * x) * self.b / self.a
+            while round(y) != round(old_y):
+                if y > old_y:
+                    old_y += 1
+                else:
+                    old_y -= 1
+                self.points.append([x + self.center_x, old_y + self.center_y])
+                self.points.append([x + self.center_x, -old_y + self.center_y])
     
     def create_param(self):
         self.points.clear()
@@ -61,7 +70,7 @@ class Ellipse():
             y = self.b * sin(t) + self.center_y
             self.points.append([x, y])
             t += step
-    
+
     def create_bresenham(self):
         self.points.clear()
         sq_b = self.b * self.b
