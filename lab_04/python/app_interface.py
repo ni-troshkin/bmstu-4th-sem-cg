@@ -381,20 +381,19 @@ class Ui_MainWindow(object):
         self.color_box.setItemText(6, _translate("MainWindow", "Цвет фона"))
         self.label_cx.setText(_translate("MainWindow", "Х центра"))
         self.label_cy.setText(_translate("MainWindow", "Y центра"))
-        self.label_a.setText(_translate("MainWindow", "Радиус окр-ти\n"
-"или полуось\n"
+        self.label_a.setText(_translate("MainWindow", "Полуось\n"
 "а эллипса"))
         self.label_b.setText(_translate("MainWindow", "Полуось\n"
 "b эллипса"))
         self.curve_btn.setText(_translate("MainWindow", "Построить кривую"))
-        self.label_starta.setText(_translate("MainWindow", "Начальный\n"
-"радиус/полуось а"))
+        self.label_starta.setText(_translate("MainWindow", "Начальная\n"
+"полуось а"))
         self.label_startb.setText(_translate("MainWindow", "Начальная\n"
 "полуось b "))
         self.label_num.setText(_translate("MainWindow", "Количество\n"
 "кривых"))
         self.label_step.setText(_translate("MainWindow", "Шаг изменения\n"
-"радиуса/полуоси а"))
+"полуоси а"))
         self.spectre_btn.setText(_translate("MainWindow", "Вывести спектр кривых"))
         self.ctime_btn.setText(_translate("MainWindow", "Время генерации окружности"))
         self.etime_btn.setText(_translate("MainWindow", "Время генерации эллипса"))

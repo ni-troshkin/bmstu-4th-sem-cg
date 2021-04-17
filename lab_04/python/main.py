@@ -1,55 +1,6 @@
 # ЛАБОРАТОРНАЯ РАБОТА N4
 # РЕАЛИЗАЦИЯ И ИССЛЕДОВАНИЕ АЛГОРИТМОВ ГЕНЕРАЦИИ ОКРУЖНОСТИ И ЭЛЛИПСА
 
-# Цель работы: реализация алгоритмов построения окружности, исследование и 
-# сравнение визуальных и временных характеристик алгоритмов.
-# При выполнении этой лабораторной работы студент должен выполнить следующий объем работ:
-# 1.Реализовать алгоритмы построения окружности на основе 
-#    - Канонического уравнения X^2+Y^2=R^2
-#    - Параметрического уравнения X=Rcost, Y=Rsint
-#    - Алгоритма Брезенхема 
-#    - Алгоритма средней точки
-#    - построение окружности с помощью библиотечной функции
-# Пользователь выбирает из списка определенный алгоритм, задает координаты центра, 
-# радиус, цвет рисования.
-# Визуальные характеристики исследуются путем рисования той же окружности цветом фона, 
-# но с помощью другого алгоритма.
-
-# 2. Реализовать алгоритмы построения эллипса на основе 
-#    - Канонического уравнения X^2/a^2+Y^2/b^2=1
-#    - Параметрического уравнения X=acost, Y=bsint
-#    - Алгоритма Брезенхема (модифицировать самостоятельно)
-#    - Алгоритма средней точки
-#    - построение эллипса с помощью библиотечной функции
-# Пользователь выбирает из списка определенный алгоритм, задает координаты центра, 
-# полуоси, цвет рисования.
-# Визуальные характеристики исследуются путем рисования того же эллипса цветом фона, 
-# но с помощью другого алгоритма.
-# П 1 и 2 предусматривают рисование одиночных кривых.
-
-# 3. Сравнение визуальных характеристик разных алгоритмов при рисовании спектра 
-# концентрических окружностей.
-# Пользователь выбирает из списка определенный алгоритм, задает координаты центра, 
-# цвет рисования, три из следующих четырех параметров: начальный радиус, конечный радиус, 
-# шаг изменения радиуса, количество окружностей.
-# Визуальные характеристики исследуются путем рисования того же спектра окружностей 
-# цветом фона, но с помощью другого алгоритма.
-
-# 4. Сравнение визуальных характеристик разных алгоритмов при рисовании спектра концентрических эллипсов.
-# Пользователь выбирает из списка определенный алгоритм, задает координаты центра, 
-# цвет рисования, начальные значения полуосей, шаг изменения одной из полуосей, количество эллипсов.
-# Визуальные характеристики исследуются путем рисования того же спектра эллипсов 
-# цветом фона, но с помощью другого алгоритма.
-
-# Дополнительное задание.
-# Сравнить временные характеристики разных алгоритмов, построив в одном поле вывода 
-# (в одной системе координат и одном масштабе) графики зависимости времени работы 
-# алгоритма от радиуса (для окружности). 
-# Для эллипсов построить аналогичную зависимость (зависимость времени работы 
-# алгоритма от изменения полуоси.  Имеется в виду, что вторая полуось тоже 
-# будет изменяться см. п.4).
-
-
 from app_interface import Ui_MainWindow
 from ellipse import Ellipse
 
@@ -63,7 +14,7 @@ import matplotlib.pyplot as plt
 from math import sin, cos, radians
 from time import time
 
-REPEATS = 100
+REPEATS = 250
 
 class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -118,11 +69,17 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.entry_startb.setStyleSheet("background-color: rgb(211, 215, 207);")
             self.entry_b.setDisabled(True)
             self.entry_startb.setDisabled(True)
+            self.label_a.setText("Радиус\nокружности")
+            self.label_starta.setText("Начальный\nрадиус")
+            self.label_step.setText("Шаг изменения\nрадиуса")
         else:
             self.entry_b.setStyleSheet("background-color: rgb(255, 255, 255);")
             self.entry_startb.setStyleSheet("background-color: rgb(255, 255, 255);")
             self.entry_b.setEnabled(True)
             self.entry_startb.setEnabled(True)
+            self.label_a.setText("Полуось\nа эллипса")
+            self.label_starta.setText("Начальная\nполуось а")
+            self.label_step.setText("Шаг изменения\nполуоси а")
 
     def generate_spectre(self, alg, color, center_x, center_y, a, b, num, step):
         pen = self.get_pen(color)
@@ -130,6 +87,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             ellipse = Ellipse(center_x, center_y, a, b)
             ellipse.generate(alg, self.scene, pen, self.bgb)
             a += step
+            b *= (1 + step / a)
             if self.figure_box.currentIndex() == 1:
                 b = a
 
@@ -257,7 +215,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.circle_plot(lib, canon, param, bres, middot)
 
-    def circle_plot(self, lib, canon, param, bres, middot):
+    def circle_plot(self, lib, canon, param, bres, middot, is_circle=True):
         xlib = list(lib.keys())
         ylib = list(lib.values())
         plt.plot(xlib, ylib, 'r', label="Библиотечный")
@@ -272,16 +230,20 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         plt.legend()
 
-        plt.xlabel("Радиус окружности")
         plt.ylabel("Время построения, мкс")
-        plt.title("Сравнение времени генерации окружностей разными алгоритмами")
+        if is_circle:
+            plt.xlabel("Радиус окружности")
+            plt.title("Сравнение времени генерации окружностей разными алгоритмами")
+        else:
+            plt.xlabel("Полуось а эллипса")
+            plt.title("Сравнение времени генерации эллипсов\n(a/b = 2) разными алгоритмами")
         plt.show()
 
     def ellipse_time(self):
         cx = 500
         cy = 500
         a = 50
-        b = 50
+        b = a / 2
         canon = dict()
         param = dict()
         lib = dict()
@@ -323,10 +285,10 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 ellipse.create_middledot()
                 sum_time += time() - start
             middot[a] = sum_time / REPEATS * 1000000
-
             a += 50
+            b = a / 2
         
-        self.circle_plot(lib, canon, param, bres, middot)
+        self.circle_plot(lib, canon, param, bres, middot, False)
 
     def clear_scene(self):
         self.scene.clear()

@@ -5,11 +5,11 @@ from math import sqrt, sin, cos, pi
 
 class Ellipse():
     def __init__(self, cx, cy, a, b):
-        self.center_x = cx
-        self.center_y = cy
+        self.center_x = int(cx)
+        self.center_y = int(cy)
 
-        self.a = a
-        self.b = b
+        self.a = int(a)
+        self.b = int(b)
 
         self.points = []
     
@@ -45,12 +45,12 @@ class Ellipse():
     def create_canon(self):
         self.points.clear()
         x = -self.a
-        y = sqrt(self.a * self.a - x * x) * self.b / self.a
+        y = int(sqrt(self.a * self.a - x * x) * self.b / self.a)
         for i in range(2 * int(self.a)):
             old_y = y
-            self.points.append([x + self.center_x, y + self.center_y])
+            self.points.append([round(x + self.center_x), round(y + self.center_y)])
             y *= -1
-            self.points.append([x + self.center_x, y + self.center_y])
+            self.points.append([round(x + self.center_x), round(y + self.center_y)])
             x += 1
             y = sqrt(self.a * self.a - x * x) * self.b / self.a
             while round(y) != round(old_y):
@@ -58,8 +58,8 @@ class Ellipse():
                     old_y += 1
                 else:
                     old_y -= 1
-                self.points.append([x + self.center_x, old_y + self.center_y])
-                self.points.append([x + self.center_x, -old_y + self.center_y])
+                self.points.append([round(x + self.center_x), round(old_y + self.center_y)])
+                self.points.append([round(x + self.center_x), round(-old_y + self.center_y)])
     
     def create_param(self):
         self.points.clear()
@@ -68,7 +68,7 @@ class Ellipse():
         while t <= 2 * pi:
             x = self.a * cos(t) + self.center_x
             y = self.b * sin(t) + self.center_y
-            self.points.append([x, y])
+            self.points.append([round(x), round(y)])
             t += step
 
     def create_bresenham(self):
@@ -81,7 +81,7 @@ class Ellipse():
         d = 2 * (1 - self.b)
         end_y = 0
         self.points.append([x, y])
-        while (y >= end_y):
+        while y >= end_y:
             if d < 0:
                 d1 = 2 * d + 2 * y - 1
                 if d1 <= 0:
@@ -105,9 +105,9 @@ class Ellipse():
                     y -= 1
                     d += 1 - 2 * y
             self.points.append([x, y])
-        self.hor_reflection()
-        self.ver_reflection()
-        self.move_to_center()
+        self.reflection()
+        # self.ver_reflection()
+        # self.move_to_center()
 
     def create_middledot(self):
         self.points.clear()
@@ -118,7 +118,6 @@ class Ellipse():
         sq_b = self.b * self.b
 
         f = sq_b - sq_a * self.b + sq_a / 4
-        x_border = sq_a / sqrt(sq_a + sq_b)
         y_border = sq_b / sqrt(sq_a + sq_b)
 
         self.points.append([x, y])
@@ -139,14 +138,19 @@ class Ellipse():
             y -= 1
             self.points.append([x, y])
 
-        self.hor_reflection()
-        self.ver_reflection()
-        self.move_to_center()
+        self.reflection()
+        # self.ver_reflection()
+        # self.move_to_center()
 
-    def hor_reflection(self):
+# нэйминг функции
+    def reflection(self):
         length = len(self.points)
         for i in range(length):
-            self.points.append([-self.points[i][0], self.points[i][1]])
+            self.points.append([-self.points[i][0] + self.center_x, self.points[i][1] + self.center_y])
+            self.points.append([self.points[i][0] + self.center_x, -self.points[i][1] + self.center_y])
+            self.points.append([-self.points[i][0] + self.center_x, -self.points[i][1] + self.center_y])
+            self.points[i][0] += self.center_x
+            self.points[i][1] += self.center_y
     
     def ver_reflection(self):
         length = len(self.points)
@@ -157,4 +161,3 @@ class Ellipse():
         for point in self.points:
             point[0] += self.center_x
             point[1] += self.center_y
-    
