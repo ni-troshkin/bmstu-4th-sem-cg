@@ -14,14 +14,15 @@ class Point():
 
 class Line():
     def __init__(self, begin: Point, end: Point):
-        self.begin = begin    # точка начала ребра
-        self.end = end    # точка конца ребра
+        self.begin = begin    # точка начала ребра, меньшая ордината
+        self.end = end    # точка конца ребра, большая ордината
+        if self.begin.y > self.end.y:
+            self.begin, self.end = self.end, self.begin
         self.next = None    # ссылка на следующее ребро в списке
-        self.str_max = None    # номер максимальной скан-строки
         self.dy = abs(self.end.y - self.begin.y)    # количество пересекающих строк
         # расчет приращения абсциссы
         if not self.is_horisontal():
-            if self.get_max_y() == self.end.y:
+            if self.end.y == self.end.y:
                 self.dx = (self.begin.x - self.end.x) / self.dy
             else:
                 self.dx = (self.end.x - self.begin.x) / self.dy
@@ -33,26 +34,11 @@ class Line():
         if self.begin.y == self.end.y:
             return True
         return False
-
-    # максимальная ордината ребра
-    def get_max_y(self):
-        return max(self.begin.y, self.end.y)
-    
-    # def printline(self):
-    #     print(self.begin.x, self.begin.y, self.next, self.x, self.dx, self.dy)
     
     # нахождение пересечения с максимальной сканирующей строкой
     def x_intersection_max_str(self):
-        delta_x = 0.5 * self.dx
-        if self.get_max_y() == self.begin.y:
-            return self.begin.x + delta_x
+        delta_x = -0.5 * self.dx
         return self.end.x + delta_x
-
-class ActiveLine():
-    def __init__(self, line):    # элемент списка активных ребер
-        self.x = line.x
-        self.dx = line.dx
-        self.dy = line.dy
 
 class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -107,7 +93,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             x = ev.x()
             y = ev.y()
             self.add_to_table(x, y)
-            self.scene.addEllipse(x-2, y-2, 4, 4, self.pen, self.brush)
 
     def add_to_table(self, x, y):
         self.points.append(Point(x, y))
@@ -125,6 +110,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.scene.addLine(self.points[-2].x, self.points[-2].y, 
                                 self.points[-1].x, self.points[-1].y, self.pen)
             self.lines.append(Line(self.points[-2], self.points[-1]))
+        
+        self.scene.addEllipse(x-2, y-2, 4, 4, self.pen, self.brush)
 
 
     # формирование окна с предупреждением с заданным текстом
@@ -138,6 +125,17 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
 
+    # формирование окна с информацией с заданным текстом
+    def show_info(self, title, text, font):
+        msg = QtWidgets.QMessageBox()
+        msg.setGeometry(800, 400, 250, 200)
+        msg.setWindowTitle(title)
+        msg.setText(text)
+        msg.setFont(QtGui.QFont(font))
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        msg.exec_()
+
     # добавление точки с точными координатами
     def add_point(self):
         try:
@@ -148,8 +146,29 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 "являться вещественными числами", "Ubuntu 15")
         else:
             self.add_to_table(x, y)
-            self.scene.addEllipse(x-2, y-2, 4, 4, self.pen, self.brush)
     
+    def get_not_max_s(self, lines, y):
+        ignore_list = []
+        i = 0
+        lines_end_here = []
+        for line in lines:
+            if line.end.y == y:
+                lines_end_here.append((line, i))
+            i += 1
+        lines_start_here = []
+        i = 0
+        for line in lines:
+            if line.begin.y == y:
+                lines_start_here.append((line, i))
+            i += 1
+        
+        for start_line in lines_start_here:
+            for end_line in lines_end_here:
+                if start_line[0].begin.x == end_line[0].end.x:
+                    ignore_list.append(end_line[1])
+
+        return ignore_list
+
     # заполнение многоугольника
     def fill_figure(self):
         # проверки на замкнутость и выбор цвета
@@ -176,13 +195,16 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             if line.is_horisontal():
                 continue    # не рассматриваем горизонтальные ребра
             
-            line.str_max = line.get_max_y() - 0.5
             line.x = line.x_intersection_max_str()
+            if line.x < min(line.begin.x, line.end.x):
+                line.x = min(line.begin.x, line.end.x)
+            if line.x > max(line.begin.x, line.end.x):
+                line.x = max(line.begin.x, line.end.x)
 
-            if y_groups[int(line.get_max_y() - self.min_y)] == None:
-                y_groups[int(line.get_max_y() - self.min_y)] = lines.index(line)
+            if y_groups[int(line.end.y - self.min_y)] == None:
+                y_groups[int(line.end.y - self.min_y)] = lines.index(line)
             else:
-                l = lines[y_groups[int(line.get_max_y() - self.min_y)]]
+                l = lines[y_groups[int(line.end.y - self.min_y)]]
                 while l.next != None:
                     l = lines[l.next]
                 l.next = lines.index(line)
@@ -190,6 +212,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         # для каждой сканирующей строки
         for i in range(len(y_groups) - 1, -1, -1):
             num_y = self.min_y + i    # фактическое значение у
+            ignore = []
             # если соответствующая скан-строка является максимальной
             # для некоторого ребра, добавляем его в САР
             if y_groups[i] != None:
@@ -198,16 +221,23 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 while line.next != None:
                     line = lines[line.next]
                     active.append(line)
+                ignore = self.get_not_max_s(active, num_y)
+            
             # сортируем абсциссы точек пересечения скан-строки с ребрами
             x_s = []
+            i = -1
             for line in active:
+                i += 1
+                if i in ignore:
+                    continue
                 x_s.append(line.x)
+ 
             x_s.sort()
             # берем из отсортированного массива пару абсцисс и заполняем
             # пиксели между ними
-            while len(x_s) > 1:
-                for i in range(int(x_s[0]), int(x_s[1] + 1)):
-                    self.scene.addLine(float(i), num_y, float(i), num_y, pen)
+            while len(x_s) > 0:
+                for i in range(int(round(x_s[0]) - 0.5), int(round(x_s[1]) + 0.5)):
+                    self.scene.addLine(i, num_y, i, num_y, pen)
                 
                 x_s.pop(0)
                 x_s.pop(0)
@@ -215,23 +245,25 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             # перейти к следующей скан-строке
             for i in range(len(active) - 1, -1, -1):
                 active[i].dy -= 1
-                if active[i].dy == 0:
+                if active[i].dy < 0:
                     active.pop(i)
                 else:
-                    active[i].x = active[i].x + active[i].dx
+                    active[i].x += active[i].dx
+                    if active[i].x < min(active[i].begin.x, active[i].end.x):
+                        active[i].x = min(active[i].begin.x, active[i].end.x)
+                    if active[i].x > max(active[i].begin.x, active[i].end.x):
+                        active[i].x = max(active[i].begin.x, active[i].end.x)
             # если заполнение с задержкой - обновить сцену
             if self.delay_check.isChecked():
-                QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 1)
+                QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents)
         
         # если заполнение без задержки - вывести сообщение о времени заполнения
         if not self.delay_check.isChecked():
             end = time()
-            QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 1)
-            self.show_warning("Закраска успешно завершена", "Время работы алгоритма: {:.1f} "
+            QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents)
+            self.show_info("Закраска успешно завершена", "Время работы алгоритма: {:.1f} "
                                 "секунд".format(end - start), "Ubuntu 15")
-    
-    
-        
+
     # замыкание многоугольника, соединяем последнюю точку 
     # с первой не входящей в замкнутую фигуру
     def close_figure(self):
