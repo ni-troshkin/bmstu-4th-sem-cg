@@ -72,14 +72,18 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.image.setPixelColor(x, y, self.get_color(self.flood_box))
 
     # обработка клика на сцену при задании фигуры
-    def bound_process(self, x, y):
+    def bound_process(self, x, y, ev = None):
         try:
             if self.boundary_color_box.currentIndex() == 0:
                 raise Warning
         except Warning:
             self.show_message("Ошибка", "Выберите цвет границ", "Ubuntu 15")
         else:
-            if self.radio_hor.isChecked() and self.last_point != None:
+            ctrl = False
+            if ev != None:
+                if ev.modifiers() == Qt.ControlModifier:
+                    ctrl = True
+            if (self.radio_hor.isChecked() or ctrl) and self.last_point != None:
                 prev_x = self.last_point.x    # построение горизонтального/вертикального отрезка
                 prev_y = self.last_point.y
                 if abs(x - prev_x) >= abs(y - prev_y):
@@ -98,7 +102,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             if self.radio_seed.isChecked():
                 self.seed_process(x, y)
             else:
-                self.bound_process(x, y)
+                self.bound_process(x, y, ev)
         self.redraw()
 
     # добавление точки и соединяющей прямой на экран
