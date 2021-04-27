@@ -2,11 +2,13 @@ from app_interface import Ui_MainWindow
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QImage, QColor
+from PyQt5.QtGui import QImage, QColor, QPen
 
-from time import sleep, time
 import sys
 from math import sqrt
+
+# комментарии
+# переход от режима к режиму отследить
 
 class Point():
     def __init__(self, x, y):
@@ -37,7 +39,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.image = QImage(int(self.scene.width()), int(self.scene.height()), QImage.Format_ARGB32_Premultiplied)
 
         self.cutter = None
         self.buf_cutter = None
@@ -51,13 +52,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.cutter_btn.clicked.connect(self.edit_cutter)
         self.clear_btn.clicked.connect(self.clear)
         self.add_btn.clicked.connect(self.add_point)
-
-    def update(self):    # обновление сцены
-        self.scene.clear()
-        print("HELLO")
-        pixmap = QtGui.QPixmap(self.image.size())
-        pixmap.convertFromImage(self.image)
-        self.scene.addPixmap(pixmap)
 
     # получение цвета по выбору пользователя
     def get_color(self, color_box):
@@ -90,11 +84,9 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.buf_cutter.top, self.buf_cutter.bottom)
         else:
             self.erase_cutter()
-            print(self.buf_cutter.top, self.buf_cutter.bottom)
             self.cutter = Cutter(color, self.buf_cutter.left, self.buf_cutter.right, 
                 self.buf_cutter.top, self.buf_cutter.bottom)
         self.draw_cutter(color)
-        self.update()
 
     # обработка клика на сцену при задании отсекателя
     def cutter_process(self, x, y):
@@ -111,8 +103,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.buf_cutter.top = y
                 self.waiting_for_second_point = True
                 self.draw_point(color, x, y)
-                # self.label = QtWidgets.QLabel("({:3d, :3d})".format(x, y))
-                self.update()
             else:
                 if x < self.buf_cutter.left:
                     self.buf_cutter.right, self.buf_cutter.left = self.buf_cutter.left, x
@@ -125,8 +115,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                     self.buf_cutter.bottom = y
 
                 self.waiting_for_second_point = False
-                # self.label2 = QtWidgets.QLabel("({:3d, :3d})".format(x, y))
-                # self.label2.setPos(x + 15, y + 15)
                 self.copy_cutter(color)
 
     # обработка клика на сцену при задании фигуры
@@ -186,15 +174,13 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.begin_point == None:
             # начало новой незамкнутой фигуры
             self.begin_point = Point(x, y)
-            self.image.setPixelColor(x, y, self.get_color(self.line_box))
         else:
             line = Line(self.begin_point, Point(x, y))
-            self.draw_line(self.get_color(self.line_box), line)
+            self.scene.addLine(line.start.x, line.start.y, line.end.x, line.end.y, QPen(self.get_color(self.line_box)))
             self.lines.append(line)
         
             self.begin_point = None
         self.draw_point(self.get_color(self.line_box), x, y)
-        self.update()
 
     # формирование окна с сообщением с заданным текстом
     def show_message(self, title, text, font, icon = QtWidgets.QMessageBox.Warning):
@@ -217,10 +203,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 "являться целыми числами", "Ubuntu 15")
         else:
             self.line_process(x, y)
-            self.update()
-
-    def get_pixel_color(self, x, y):    # получение цвета пиксела с координатой
-        return self.image.pixelColor(x, y)
     
     def edit_cutter(self):
         try:
@@ -242,86 +224,19 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.buf_cutter = Cutter(color, left, right, top, bottom)
             self.copy_cutter(color)
 
-    # Брезенхем
-    def draw_line(self, color, line):
-        print(line.start.x, line.start.y, "->", line.end.x, line.end.y)
-        if color == Qt.white:
-            print("White")
-        else:
-            print("Not White")
-        if abs(line.end.x - line.start.x) < 0.5 and abs(line.end.y - line.start.y) < 0.5:
-            self.image.setPixelColor(int(round(line.end.x)), int(round(line.end.y)), color)
-            return
-
-        x = line.start.x
-        y = line.start.y
-
-        dx = abs(line.end.x - line.start.x)
-        dy = abs(line.end.y - line.start.y)
-
-        def sign(a):
-            if (a < 0):
-                return -1
-            if (a > 0):
-                return 1
-            return 0
-
-        signx = sign(line.end.x - line.start.x)
-        signy = sign(line.end.y - line.start.y)
-
-        if dy <= dx: # горизонтальный наклон
-            change = 0
-        else:
-            change = 1    # вертикальный наклон
-            dx, dy = dy, dx
-
-        error = 2000 * dy - 1000 * dx + int(100 * (line.start.x - int(line.start.x)))
-        if error >= 0:
-            if change == 1:
-                x += signx
-            else:
-                y += signy
-            error -= 2000 * dx
-
-        for i in range(int(dx) + 1):
-            self.image.setPixelColor(int(round(x)), int(round(y)), color)
-            
-            if color == self.get_color(self.result_box):
-                self.image.setPixelColor(int(round(x)), int(round(y - signy)), color)
-            
-            if error >= 0:
-                if change == 1:
-                    x += signx
-                else:
-                    y += signy
-                error -= 2000 * dx
-        
-            if error < 0:
-                if change == 1:
-                    y += signy
-                else:
-                    x += signx
-                error += 2000 * dy
-
     def erase_cutter(self):
         self.draw_cutter(Qt.white)
 
     def draw_cutter(self, color):
-        self.draw_line(color, self.cutter.top_line)
-        self.draw_line(color, self.cutter.bottom_line)
-        self.draw_line(color, self.cutter.left_line)
-        self.draw_line(color, self.cutter.right_line)
-    
+        self.scene.addLine(self.cutter.left, self.cutter.top, self.cutter.right, self.cutter.top, QPen(color))
+        self.scene.addLine(self.cutter.left, self.cutter.bottom, self.cutter.right, self.cutter.bottom, QPen(color))
+        self.scene.addLine(self.cutter.left, self.cutter.top, self.cutter.left, self.cutter.bottom, QPen(color))
+        self.scene.addLine(self.cutter.right, self.cutter.top, self.cutter.right, self.cutter.bottom, QPen(color))
+        
     def draw_point(self, color, x, y):
-        self.image.setPixelColor(x, y, color)
-        self.image.setPixelColor(x - 1, y, color)
-        self.image.setPixelColor(x + 1, y, color)
-        self.image.setPixelColor(x, y - 1, color)
-        self.image.setPixelColor(x - 1, y - 1, color)
-        self.image.setPixelColor(x + 1, y - 1, color)
-        self.image.setPixelColor(x, y + 1, color)
-        self.image.setPixelColor(x - 1, y + 1, color)
-        self.image.setPixelColor(x + 1, y + 1, color)
+        self.scene.addLine(x - 1, y - 1, x + 1, y - 1, QPen(color))
+        self.scene.addLine(x - 1, y, x + 1, y, QPen(color))
+        self.scene.addLine(x - 1, y + 1, x + 1, y + 1, QPen(color))
 
     def is_visible(self, line, params):
         sum1 = self.get_code(line.start, params)
@@ -350,6 +265,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def cut_line(self, line):
         color = self.get_color(self.result_box)
+        pen = QPen(color)
+        pen.setWidth(2)
         flag = 1
         if line.end.x - line.start.x == 0:
             flag = -1
@@ -359,25 +276,17 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                 flag = 0
         cutter_params = [self.cutter.left, self.cutter.right, self.cutter.bottom, self.cutter.top]
         for i in range(4):
-            print(cutter_params)
-            print(line.start.x, line.start.y, "->", line.end.x, line.end.y)
-            print(i, cutter_params[i])
             visible = self.is_visible(line, cutter_params)
-            print(line.start.code, line.end.code)
             if visible == 1:
-                print("visible")
-                self.draw_line(color, line)
+                self.scene.addLine(line.start.x, line.start.y, line.end.x, line.end.y, pen)
                 return
             if visible == -1:
-
                 return
             if line.start.code[3 - i] == line.end.code[3 - i]:
                 continue
             if line.start.code[3 - i] == 0:
-                print("changed")
                 line.start, line.end = line.end, line.start
             if flag != -1 and i <= 1:
-                print("!")
                 line.start.y = k * (cutter_params[i] - line.start.x) + line.start.y
                 line.start.x = cutter_params[i]
             else:
@@ -385,7 +294,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                     if flag != -1:
                         line.start.x = (1 / k) * (cutter_params[i] - line.start.y) + line.start.x
                     line.start.y = cutter_params[i]
-        self.draw_line(color, line)
+        self.scene.addLine(line.start.x, line.start.y, line.end.x, line.end.y, pen)
 
     def cut_lines(self):
         try:
@@ -401,14 +310,14 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         for line in self.lines:
             self.cut_line(line)
-        
-        self.update()
 
     # очистка экрана
     def clear(self):
         self.scene.clear()
-        self.image.fill(Qt.white)
         self.lines.clear()
+        self.cutter = None
+        self.buf_cutter = None
+        self.waiting_for_second_point = False
 
     def exit(self):
         sys.exit(0)
