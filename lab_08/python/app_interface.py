@@ -344,7 +344,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Алгоритм отсечения Кириуса-Бека"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Алгоритм отсечения Кируса-Бека"))
         self.radio_cutter.setText(_translate("MainWindow", "Ввод отсекателя"))
         self.radio_line.setText(_translate("MainWindow", "Ввод отрезков"))
         self.cutter_box.setItemText(0, _translate("MainWindow", "Цвет отсекателя..."))
