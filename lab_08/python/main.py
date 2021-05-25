@@ -140,24 +140,35 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             k_min = None
             for i in range(len(self.cutter)):
                 # угловой коэффициент ребра (ах + ву + с = 0)
-                a = (self.cutter[(i + 1) % len(self.cutter)].y - self.cutter[i].y)\
-                    / (self.cutter[(i + 1) % len(self.cutter)].x - self.cutter[i].x)
-                b = -1
-                c = self.cutter[i].y - a * self.cutter[i].x
-                # расстояние до i-го ребра отсекателя от первой точки отрезка
-                dist = abs(a * self.begin_point.x + b * self.begin_point.y + c) / sqrt(a * a + b * b)
+                # проверка на вертикальность
+                if abs(self.cutter[(i + 1) % len(self.cutter)].x - self.cutter[i].x) > 1e-7:
+                    a = (self.cutter[(i + 1) % len(self.cutter)].y - self.cutter[i].y)\
+                        / (self.cutter[(i + 1) % len(self.cutter)].x - self.cutter[i].x)
+                    b = -1
+                    c = self.cutter[i].y - a * self.cutter[i].x
+                    # расстояние до i-го ребра отсекателя от первой точки отрезка
+                    dist = abs(a * self.begin_point.x + b * self.begin_point.y + c) / sqrt(a * a + b * b)
+                else:
+                    dist = abs(x - self.cutter[i].x)
+                    a = None
                 if dist < min_dist:
                     min_dist = dist
                     k_min = a
             # строится отрезок той же длины, которую задал пользователь, но доворачивается
             # до нужного углового коэффициента
             length = sqrt((x - self.begin_point.x) ** 2 + (y - self.begin_point.y) ** 2)
-            dx = sqrt(length * length / (1 + k_min * k_min))
-            dy = dx * k_min
-            # выбор направления построения
-            if (x - self.begin_point.x) * dx < 0:
-                dx, dy = -dx, -dy
-            
+            if k_min != None:
+                dx = sqrt(length * length / (1 + k_min * k_min))
+                dy = dx * k_min
+                # выбор направления построения
+                if (x - self.begin_point.x) * dx < 0:
+                    dx, dy = -dx, -dy
+            else:
+                dx = 0
+                dy = length
+                if y < self.begin_point.y:
+                    dy *= -1
+
             x = self.begin_point.x + dx
             y = self.begin_point.y + dy
 
