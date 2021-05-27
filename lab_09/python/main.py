@@ -312,6 +312,13 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         return True
 
+    def cutter_is_clockwise(self):
+        first = Vector(self.cutter[0], self.cutter[1])
+        second = Vector(self.cutter[1], self.cutter[2])
+        if first.cross_product(second) < 0:
+            return False
+        return True
+
     # отсечение всех текущих отрезков текущим отсекателем
     def cut_figure(self):
         try:
@@ -332,6 +339,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.show_message("Ошибка", "Задайте замкнутый многоугольник для отсечения", "Ubuntu 15")
 
         else:
+            if self.cutter_is_clockwise():
+                self.cutter.reverse()
             # создаем копию отсекаемого многоугольника
             copy_figure = []
             for i in range(len(self.figure)):
