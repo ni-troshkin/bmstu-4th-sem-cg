@@ -163,8 +163,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def mousePressEvent(self, ev):
         if self.check_event(ev) == 1:
             ev.accept()
-            x = ev.x()
-            y = ev.y()
+            x = ev.x() + 18
+            y = ev.y() + 12
 
             # проверка, выбран ли цвет
             try:
@@ -312,9 +312,9 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         return True
 
-    def cutter_is_clockwise(self):
-        first = Vector(self.cutter[0], self.cutter[1])
-        second = Vector(self.cutter[1], self.cutter[2])
+    def polygon_is_clockwise(self, polygon):
+        first = Vector(polygon[0], polygon[1])
+        second = Vector(polygon[1], polygon[2])
         if first.cross_product(second) < 0:
             return False
         return True
@@ -339,8 +339,11 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.show_message("Ошибка", "Задайте замкнутый многоугольник для отсечения", "Ubuntu 15")
 
         else:
-            if self.cutter_is_clockwise():
+            if self.polygon_is_clockwise(self.cutter):
                 self.cutter.reverse()
+            if self.polygon_is_clockwise(self.figure):
+                self.figure.reverse()
+            
             # создаем копию отсекаемого многоугольника
             copy_figure = []
             for i in range(len(self.figure)):
