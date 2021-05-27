@@ -93,8 +93,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def mousePressEvent(self, ev):
         if self.check_event(ev) == 1:
             ev.accept()
-            x = ev.x()
-            y = ev.y()
+            x = ev.x() - 18
+            y = ev.y() - 12
             # проверка, выбран ли цвет
             try:
                 if self.radio_cutter.isChecked() and self.cutter_box.currentIndex() == 0:
