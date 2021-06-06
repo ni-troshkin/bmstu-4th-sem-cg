@@ -27,7 +27,7 @@ class Ui_MainWindow(object):
         self.gridLayout.setObjectName("gridLayout")
         self.scene = QtWidgets.QGraphicsScene()
         self.scene.setSceneRect(5, 11, 1195, 869)
-        self.canvas = QtWidgets.QGraphicsView(self.widget)
+        self.canvas = QtWidgets.QGraphicsView(self.scene, self.widget)
         self.canvas.setMinimumSize(QtCore.QSize(1200, 880))
         self.canvas.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.canvas.setObjectName("canvas")
