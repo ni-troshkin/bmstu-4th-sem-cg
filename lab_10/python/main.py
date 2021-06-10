@@ -74,18 +74,22 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def horizon(self, start_x, start_y, end_x, end_y):
         if end_x == start_x:
+            if end_x >= self.scene.width():
+                return
             self.max_horizon[end_x] = max(self.max_horizon[end_x], end_y)#max(start_y, end_y))
             self.min_horizon[end_x] = min(self.min_horizon[end_x], end_y)#min(start_y, end_y))
         else:
             k = (end_y - start_y) / (end_x - start_x)
             for x in range(start_x, end_x + 1):
+                if x >= self.scene.width():
+                    break
                 y = k * (x - start_x) + start_y
                 self.max_horizon[x] = max(self.max_horizon[x], y)
                 self.min_horizon[x] = min(self.min_horizon[x], y)
     
     def is_visible(self, x, y):
         x = int(round(x))
-        if x > self.scene.width():
+        if x < 0 or x >= self.scene.width():
             return 0
         if y < self.max_horizon[x] and y > self.min_horizon[x]:
             return 0
@@ -104,14 +108,16 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         # print(x_start, y_start, x_end, y_end)
         # print(x_start, horizon[x_start], x_end, horizon[x_end])
         if x_end == x_start:
-            return x_end, horizon[x_end]
+            if 0 <= x_end < self.scene.width():
+                return x_end, horizon[x_end]
+            return self.scene.width() - 1, horizon[self.scene.width() - 1]
         
         k = (y_end - y_start) / (x_end - x_start)
         sy = sign(y_start + k - horizon[x_start + 1])
         sc = sy
         y = y_start + k
         x = x_start + 1
-        while sc == sy and x < x_end:
+        while sc == sy and x < x_end and x < self.scene.width():
             sc = sign(y - horizon[x])
             y += k
             x += 1
@@ -140,7 +146,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             x_last, y_last, z_buf = self.transform(x_last, y_last, z)
             
             if x_left != -1:
-                self.scene.addLine(x_last, y_last, x_left, y_left, QPen(color))
+                if self.is_visible(x_left, y_left) and self.is_visible(x_last, y_last):
+                    self.scene.addLine(x_last, y_last, x_left, y_left, QPen(color))
                 self.horizon(x_last, y_last, x_left, y_left)
 
             x_left = x_last
