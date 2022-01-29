@@ -158,23 +158,19 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             while x <= x_to:
                 y = f(x, z)
                 x_curr, y_curr, z_buf = self.transform(x, y, z)
-                # print(x_curr, y_curr)
+                
                 curr_visibility = self.is_visible(x_curr, y_curr)
                 if prev_visibility == curr_visibility:
                     if curr_visibility:
-                        # print("ADDLINE", x_last, y_last, x_curr, y_curr)
                         self.scene.addLine(x_last, y_last, x_curr, y_curr, QPen(color))
                         self.horizon(x_last, y_last, x_curr, y_curr)
-                    # else:
-                    #     print("FQ")
                 else:
-                    if not curr_visibility:
+                    if not curr_visibility and x_curr - x_last > 1:
                         if prev_visibility == 1:
                             x_inter, y_inter = self.intersection(x_last, y_last, x_curr, y_curr, self.max_horizon)
                         else:
                             x_inter, y_inter = self.intersection(x_last, y_last, x_curr, y_curr, self.min_horizon)
                         
-                        # print("ADDLINE")
                         self.scene.addLine(x_last, y_last, x_inter, y_inter, QPen(color))
                         self.horizon(x_last, y_last, x_inter, y_inter)
                     elif curr_visibility == 1:
@@ -220,7 +216,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             y_right = y_curr
             z -= z_step
     
-
     def draw_surface(self):
         try:
             x_from = self.x_from_entry.value()
